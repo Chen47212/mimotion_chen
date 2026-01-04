@@ -198,13 +198,33 @@ class MiMotionRunner:
     def login_and_post_step(self, min_step, max_step):
         if self.invalid:
             return "账号或密码配置有误", False
+    
         app_token = self.login()
         if app_token is None:
             return "登陆失败！", False
-
-        step = str(random.randint(min_step, max_step))
-        self.log_str += f"已设置为随机步数范围({min_step}~{max_step}) 随机值:{step}\n"
+    
+        # 基础随机步数
+        step = random.randint(min_step, max_step)
+    
+        # 判断是否为周六 / 周天
+        today = datetime.datetime.now().weekday()
+        # weekday(): 周一=0 ... 周六=5 周日=6
+        if today in (5, 6):
+            reduce_step = random.randint(3000, 5500)
+            step = max(0, step - reduce_step)
+            self.log_str += (
+                f"周末模式：基础步数({min_step}~{max_step})，"
+                f"减少 {reduce_step}，最终步数 {step}\n"
+            )
+        else:
+            self.log_str += (
+                f"工作日模式：已设置为随机步数范围({min_step}~{max_step})，"
+                f"随机值 {step}\n"
+            )
+    
+        step = str(step)
         ok, msg = zeppHelper.post_fake_brand_data(step, app_token, self.user_id)
+    
         return f"修改步数（{step}）[" + msg + "]", ok
 
 
