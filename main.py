@@ -207,7 +207,7 @@ class MiMotionRunner:
         step = random.randint(min_step, max_step)
     
         # 判断是否为周六 / 周天
-        today = datetime.datetime.now().weekday()
+        today = datetime.now().weekday()
         # weekday(): 周一=0 ... 周六=5 周日=6
         if today in (5, 6):
             reduce_step = random.randint(3000, 5500)
